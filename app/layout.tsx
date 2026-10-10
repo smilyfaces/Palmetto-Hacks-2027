@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
-import BottomNav from "@/components/BottomNav";
  
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,18 +25,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-screen flex flex-col">
-        <div className="fixed top-0 left-0 z-50 w-full px-4">
-          <Header />
-        </div>
- 
         {children}
- 
-        <div className="fixed bottom-6 left-0 z-50 w-full px-4">
-          {/* usePathname() inside BottomNav needs a Suspense boundary */}
-          <Suspense fallback={null}>
-            <BottomNav />
-          </Suspense>
-        </div>
       </body>
     </html>
   );
