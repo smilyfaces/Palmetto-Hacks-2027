@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function Header() {
     return (
-        <div className="absolute left-0 right-0 top-0 z-40 flex h-20 bg-white/0 justify-between">
+        <div className="left-0 right-0 top-0 z-40 flex h-20 bg-white/0 justify-between">
             <Image
                 src="/logo.png"
                 alt="Logo"
