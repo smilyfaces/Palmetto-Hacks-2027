@@ -7,6 +7,7 @@ import Image from "next/image";
 import CameraFeed from "@/components/camera-feed";
 import ImageUpload from "@/components/image-upload";
 import SendToGeminiButton from "@/components/send-request";
+import TakePhotoButton from "@/components/photo-button";
 
 export default function new_meal_page() {
     const [images, setImages] = useState<string[]>([]);
@@ -17,7 +18,7 @@ export default function new_meal_page() {
           <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
             New Meal
           </h1>
-          <CameraFeed onCapture={(img) => console.log(img.slice(0, 40))} />;
+           <CameraFeed onCapture={(img) => setImages((prev) => [...prev, img])} />
         </div>
         <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
           <ImageUpload images={images} onChange={setImages} />

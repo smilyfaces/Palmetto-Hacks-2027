@@ -24,7 +24,6 @@ export default function Home() {
             </code>{" "}
             file.
           </h1>
-          <CameraFeed onCapture={(img) => console.log(img.slice(0, 40))} />;
         </div>
         <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
           <a
