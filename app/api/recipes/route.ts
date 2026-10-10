@@ -1,63 +1,71 @@
-import { GoogleGenAI } from "@google/genai";
-import { NextResponse } from "next/server";
-
-export async function POST(request: Request) {
-    try {
-        const body = await request.json();
-        const ingredients = body.ingredients;
-        const preference = body.preference || "quick and easy";
-
-        if (!Array.isArray(ingredients) || ingredients.length === 0) {
-            return NextResponse.json(
-                { error: "Please provide at least one ingredient." },
-                { status: 400 }
-            );
-        }
-
-        const ai = new GoogleGenAI({
-            apiKey: process.env.GEMINI_API_KEY,
+import { pool } from "../../../lib/db";
+import { normalize, STAPLES } from "../../../lib/normalize";
+ 
+type Ingredient = { name?: string; measure?: string };
+ 
+const tokens = (s: string) => new Set(s.split(" ").filter(Boolean));
+const containsAll = (big: Set<string>, small: Set<string>) => [...small].every((t) => big.has(t));
+ 
+export async function POST(req: Request) {
+  const { ingredients } = await req.json();
+  if (!Array.isArray(ingredients) || ingredients.length === 0) {
+    return Response.json({ error: "No ingredients were sent" }, { status: 400 });
+  }
+ 
+  // What the user has, as word sets: "Chicken Breasts" -> {chicken, breast}
+  const have = (ingredients as unknown[])
+    .map((x) => normalize(String(x)))
+    .filter(Boolean)
+    .map(tokens);
+ 
+  try {
+    // The table is a few hundred rows, so we fetch the light columns and match in code.
+    const { rows } = await pool.query(
+      "SELECT meal_id, name, thumbnail_url, ingredients FROM recipes"
+    );
+ 
+    const results = [];
+    for (const row of rows) {
+      const list: Ingredient[] = Array.isArray(row.ingredients) ? row.ingredients : [];
+      const haveList: string[] = [];
+      const missingList: string[] = [];
+ 
+      for (const ing of list) {
+        const name = ing.name ?? "";
+        const n = normalize(name);
+        if (!n || STAPLES.has(n)) continue;
+ 
+        // Match if one phrase's words are all inside the other's:
+        // "chicken" matches "chicken breast", "cheddar cheese" matches "cheese"
+        const t = tokens(n);
+        const matched = have.some((u) => containsAll(t, u) || containsAll(u, t));
+        (matched ? haveList : missingList).push(name);
+      }
+ 
+      if (haveList.length > 0) {
+        results.push({
+          id: row.meal_id,
+          title: row.name,
+          imageUrl: row.thumbnail_url,
+          have: haveList,
+          missing: missingList,
         });
-
-        const response = await ai.models.generateContent({
-            model: "gemini-3.8-flash",
-            contents: `You are a helpful recipe assistant for college students.
-
-Available ingredients: ${ingredients.join(", ")}
-Cooking preference: ${preference}
-
-Create exactly 3 realistic recipes that use as many available ingredients as possible.
-You may list common pantry staples separately, but do not assume the user owns unusual ingredients.
-
-Return ONLY valid JSON in exactly this format:
-{
-  "recipes": [
-    {
-      "title": "Recipe name",
-      "description": "One-sentence description",
-      "timeMinutes": 20,
-      "ingredientsUsed": ["ingredient 1", "ingredient 2"],
-      "missingIngredients": ["optional missing item"],
-      "steps": [
-        "Step one",
-        "Step two"
-      ]
+      }
     }
-  ]
-}`,
-            config: {
-                responseMimeType: "application/json",
-            },
-        });
-
-        const recipes = JSON.parse(response.text || "{}");
-
-        return NextResponse.json(recipes);
-    } catch (error) {
-        console.error("Recipe route error:", error);
-
-        return NextResponse.json(
-            { error: "Could not generate recipes. Please try again." },
-            { status: 500 }
-        );
-    }
+ 
+    // Fewest missing ingredients first, then most matched
+    results.sort((a, b) => a.missing.length - b.missing.length || b.have.length - a.have.length);
+ 
+    return Response.json({ recipes: results.slice(0, 20) });
+  } catch (err) {
+    console.error(err);
+    return Response.json(
+      {
+        error: "Recipe lookup failed.",
+        detail: err instanceof Error ? err.message : String(err),
+      },
+      { status: 500 }
+    );
+  }
 }
+ 

@@ -4,9 +4,21 @@ import { useState } from "react";
  
 type Props = {
   images: string[]; // JPEG data URLs
+  onIngredients?: (ingredients: string[]) => void; // the parsed list, once Gemini replies
 };
  
-export default function SendToGeminiButton({ images }: Props) {
+// Gemini sometimes wraps its JSON in ```json fences even when told not to
+function parseIngredients(text: string): string[] {
+  const cleaned = text.replace(/```json|```/g, "").trim();
+  try {
+    const parsed = JSON.parse(cleaned);
+    return Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === "string") : [];
+  } catch {
+    return [];
+  }
+}
+ 
+export default function SendToGeminiButton({ images, onIngredients }: Props) {
   const [sending, setSending] = useState(false);
   const [pressed, setPressed] = useState(false);
   const [text, setText] = useState<string | null>(null); // null = nothing received yet
@@ -30,6 +42,7 @@ export default function SendToGeminiButton({ images }: Props) {
  
       console.log("Gemini replied:", data.text);
       setText(data.text);
+      onIngredients?.(parseIngredients(data.text));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Request failed");
     }
@@ -78,9 +91,8 @@ export default function SendToGeminiButton({ images }: Props) {
           />
         )}
         {sending
-            //${empty ? "" : images.length + " "}image${images.length === 1 ? "" : "s"}
-          ? "Loading Recipes..."
-          : `Find Recipes`}
+          ? "Find Recipes…"
+          : `Load Recipes`}
       </button>
  
       {empty && !sending && (
@@ -93,16 +105,14 @@ export default function SendToGeminiButton({ images }: Props) {
             {error}
           </p>
         )}
- 
-        {/* The returned text from Gemini, printed as-is */}
+        
+        {/* The returned text from Gemini, printed as-is 
         {text !== null && (
           <pre style={{ whiteSpace: "pre-wrap", marginTop: 12 }}>
             {text || "(Gemini returned an empty response)"}
           </pre>
-        )}
+        )}*/}
       </div>
     </div>
   );
 }
- 
- 

@@ -8,9 +8,11 @@ import CameraFeed from "@/components/CameraFeed";
 import ImageUpload from "@/components/ImageUpload";
 import SendToGeminiButton from "@/components/SendRequest";
 import TakePhotoButton from "@/components/PhotoButton";
+import RecipeList from "@/components/RecipeList";
 
 export default function new_meal_page() {
     const [images, setImages] = useState<string[]>([]);
+    const [ingredients, setIngredients] = useState<string[]>([]);
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
@@ -22,7 +24,8 @@ export default function new_meal_page() {
         </div>
         <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
           <ImageUpload images={images} onChange={setImages} />
-          <SendToGeminiButton images={images} />
+          <SendToGeminiButton images={images} onIngredients={setIngredients} />
+          <RecipeList ingredients={ingredients} />
         </div>
       </main>
     </div>
