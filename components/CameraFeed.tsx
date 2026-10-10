@@ -1,125 +1,148 @@
 "use client";
- 
+
 import { useEffect, useRef, useState } from "react";
 import ShutterButton from "./PhotoButton";
- 
+
 type Props = {
-  // Called with a downscaled JPEG data URL each time the shutter is pressed
   onCapture: (dataUrl: string) => void;
 };
- 
+
 export default function CameraFeed({ onCapture }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const attempt = useRef(0); // lets us ignore camera requests that finish after unmount or a retry
-  const [active, setActive] = useState(false);
+
+  const [cameraOpen, setCameraOpen] = useState(false);
   const [error, setError] = useState("");
- 
-  async function startCamera() {
-    const mine = ++attempt.current;
+
+  async function openCamera() {
     setError("");
- 
-    if (!navigator.mediaDevices?.getUserMedia) {
-      setError("This browser can't open the camera here. Camera access needs HTTPS (or localhost).");
-      return;
-    }
- 
+
     try {
-      // Back camera on phones; falls back to the webcam on laptops and desktops
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { ideal: "environment" } },
         audio: false,
       });
- 
-      // Unmounted (or a newer attempt started) while the permission prompt was open
-      if (mine !== attempt.current) {
-        stream.getTracks().forEach((t) => t.stop());
-        return;
-      }
- 
-      // If the camera gets unplugged or taken by another app, mark the feed inactive
-      stream.getVideoTracks()[0]?.addEventListener("ended", () => setActive(false));
- 
+
       streamRef.current = stream;
-      const video = videoRef.current!;
-      video.srcObject = stream;
-      await video.play();
-      setActive(true);
-    } catch {
-      if (mine === attempt.current) {
-        setError("Couldn't access the camera. Allow camera permission in your browser, then try again.");
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
       }
+
+      setCameraOpen(true);
+    } catch {
+      setError(
+        "Could not access the camera. Allow camera permission, then try again."
+      );
     }
   }
- 
-  // Open the camera on mount, release it on unmount
+
+  function closeCamera() {
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+
+    setCameraOpen(false);
+  }
+
+  function handleCapture(image: string) {
+    onCapture(image);
+    closeCamera();
+  }
+
   useEffect(() => {
-    startCamera();
     return () => {
-      attempt.current++;
-      streamRef.current?.getTracks().forEach((t) => t.stop());
-      streamRef.current = null;
+      streamRef.current?.getTracks().forEach((track) => track.stop());
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
- 
+
   return (
-    <div
+    <section
       style={{
+        width: "100%",
         maxWidth: 480,
-        background: "#000",
-        color: "#fff",
-        borderRadius: 16,
         overflow: "hidden",
+        borderRadius: 16,
+        background: "#111827",
+        color: "white",
       }}
     >
-      {/* playsInline + muted are required for inline playback on iOS Safari */}
       <video
         ref={videoRef}
         playsInline
         muted
-        style={{ width: "100%", display: active ? "block" : "none" }}
-      />
- 
-      {!active && (
-        <p role={error ? "alert" : undefined} style={{ padding: 16, margin: 0 }}>
-          {error || "Starting camera…"}
-        </p>
-      )}
- 
-      <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "1fr auto 1fr",
-          alignItems: "center",
-          padding: "16px 20px",
+          display: cameraOpen ? "block" : "none",
+          width: "100%",
         }}
-      >
-        {error ? (
+      />
+
+      {!cameraOpen && (
+        <div style={{ padding: 24, textAlign: "center" }}>
+          <p style={{ marginTop: 0 }}>
+            Take a photo of the ingredients in your fridge or pantry.
+          </p>
+
           <button
             type="button"
-            onClick={startCamera}
+            onClick={openCamera}
             style={{
-              justifySelf: "start",
-              background: "transparent",
               border: "none",
-              color: "#fff",
-              font: "inherit",
+              borderRadius: 999,
+              padding: "12px 18px",
+              background: "#22c55e",
+              color: "#052e16",
+              fontSize: 16,
+              fontWeight: 700,
               cursor: "pointer",
-              textDecoration: "underline",
             }}
           >
-            Try again
+            Take a Photo
           </button>
-        ) : (
-          <span />
-        )}
- 
-        <ShutterButton videoRef={videoRef} active={active} onCapture={onCapture} />
- 
-        <span />
-      </div>
-    </div>
+
+          {error && (
+            <p role="alert" style={{ marginBottom: 0, color: "#fecaca" }}>
+              {error}
+            </p>
+          )}
+        </div>
+      )}
+
+      {cameraOpen && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "16px 20px",
+          }}
+        >
+          <button
+            type="button"
+            onClick={closeCamera}
+            style={{
+              border: "none",
+              background: "transparent",
+              color: "white",
+              cursor: "pointer",
+            }}
+          >
+            Cancel
+          </button>
+
+          <ShutterButton
+            videoRef={videoRef}
+            active={cameraOpen}
+            onCapture={handleCapture}
+          />
+
+          <span style={{ width: 48 }} />
+        </div>
+      )}
+    </section>
   );
 }
- 
