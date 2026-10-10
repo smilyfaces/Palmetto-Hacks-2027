@@ -32,8 +32,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 
         {children}
 
-        <div className="fixed bottom-6 left-0 z-50 w-full px-4">
-          <BottomNav />
+        <div className="fixed bottom-6 left-0 z-30 w-full px-6">
+          <div className="rounded-4xl bg-white/80">
+              <BottomNav />
+          </div>
         </div>
       </body>
     </html>

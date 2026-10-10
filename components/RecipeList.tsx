@@ -31,6 +31,10 @@ export default function RecipeList({ ingredients }: Props) {
       .then(async (res) => {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error ?? `Request failed (${res.status})`);
+        if (!Array.isArray(data.recipes)) {
+          console.error("Unexpected /api/recipes response:", data);
+          throw new Error("The recipe service returned an unexpected response.");
+        }
         if (!cancelled) setRecipes(data.recipes);
       })
       .catch((err) => !cancelled && setError(err instanceof Error ? err.message : "Request failed"))
