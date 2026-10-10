@@ -4,7 +4,6 @@ export default function Community_Page() {
     return (
         <div>
             <p>Community Page</p>
-            <BottomNav />
         </div>
     );
 }
