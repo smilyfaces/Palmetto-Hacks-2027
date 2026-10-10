@@ -1,26 +1,46 @@
 "use client";
- 
+
 import { useState } from "react";
- 
+
+type Recipe = {
+  title: string;
+  description: string;
+  timeMinutes: number;
+  ingredientsUsed: string[];
+  missingIngredients: string[];
+  steps: string[];
+};
+
 type Props = {
   images: string[]; // JPEG data URLs
+  onIngredients?: (ingredients: string[]) => void; // the parsed list, once Gemini replies
 };
  
-export default function SendToGeminiButton({ images }: Props) {
+// Gemini sometimes wraps its JSON in ```json fences even when told not to
+function parseIngredients(text: string): string[] {
+  const cleaned = text.replace(/```json|```/g, "").trim();
+  try {
+    const parsed = JSON.parse(cleaned);
+    return Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === "string") : [];
+  } catch {
+    return [];
+  }
+}
+ 
+export default function SendToGeminiButton({ images, onIngredients }: Props) {
   const [sending, setSending] = useState(false);
-  const [pressed, setPressed] = useState(false);
-  const [text, setText] = useState<string | null>(null); // null = nothing received yet
+  const [ingredients, setIngredients] = useState<string[]>([]);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [error, setError] = useState("");
- 
-  const empty = images.length === 0;
-  const disabled = empty || sending;
- 
-  async function send() {
+
+  async function findRecipes() {
     setSending(true);
     setError("");
-    setText(null);
+    setIngredients([]);
+    setRecipes([]);
+
     try {
-      const res = await fetch("/api/test-gemini", {
+      const visionResponse = await fetch("/api/test-gemini", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ images }),
@@ -30,39 +50,22 @@ export default function SendToGeminiButton({ images }: Props) {
  
       console.log("Gemini replied:", data.text);
       setText(data.text);
+      onIngredients?.(parseIngredients(data.text));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Request failed");
+      setError(
+        err instanceof Error ? err.message : "Something went wrong. Please try again."
+      );
+    } finally {
+      setSending(false);
     }
-    setSending(false);
   }
- 
+
   return (
-    <div>
-      <style>{`@keyframes gemini-spin { to { transform: rotate(360deg); } }`}</style>
- 
+    <section style={{ width: "100%", maxWidth: 720 }}>
       <button
         type="button"
-        onClick={send}
-        disabled={disabled}
-        aria-busy={sending}
-        onPointerDown={() => setPressed(true)}
-        onPointerUp={() => setPressed(false)}
-        onPointerLeave={() => setPressed(false)}
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 8,
-          padding: "6px 12px",
-          border: "1px solid currentColor",
-          borderRadius: 6,
-          background: "transparent",
-          color: "inherit",
-          font: "inherit",
-          cursor: disabled ? "not-allowed" : "pointer",
-          opacity: disabled ? 0.5 : 1,
-          transform: pressed && !disabled ? "scale(0.97)" : "none",
-          transition: "transform 80ms",
-        }}
+        onClick={findRecipes}
+        disabled={images.length === 0 || sending}
       >
         {sending && (
           <span
@@ -78,13 +81,46 @@ export default function SendToGeminiButton({ images }: Props) {
           />
         )}
         {sending
-            //${empty ? "" : images.length + " "}image${images.length === 1 ? "" : "s"}
-          ? "Loading Recipes..."
-          : `Find Recipes`}
+          ? "Find Recipes…"
+          : `Load Recipes`}
       </button>
- 
-      {empty && !sending && (
-        <p style={{ fontSize: 14, opacity: 0.7, marginTop: 6 }}>Upload at least one image first.</p>
+
+      {error && <p role="alert">{error}</p>}
+
+      {ingredients.length > 0 && (
+        <div>
+          <h2>Ingredients Gemini found</h2>
+          <p>{ingredients.join(", ")}</p>
+        </div>
+      )}
+
+      {recipes.length > 0 && (
+        <div>
+          <h2>Recipes you can make</h2>
+
+          {recipes.map((recipe) => (
+            <article key={recipe.title}>
+              <h3>{recipe.title}</h3>
+              <p>{recipe.description}</p>
+              <p>
+                <strong>Time:</strong> {recipe.timeMinutes} minutes
+              </p>
+              <p>
+                <strong>Uses:</strong> {recipe.ingredientsUsed.join(", ")}
+              </p>
+              <p>
+                <strong>Optional extras:</strong>{" "}
+                {recipe.missingIngredients.join(", ")}
+              </p>
+
+              <ol>
+                {recipe.steps.map((step, index) => (
+                  <li key={index}>{step}</li>
+                ))}
+              </ol>
+            </article>
+          ))}
+        </div>
       )}
  
       <div aria-live="polite">
@@ -93,16 +129,14 @@ export default function SendToGeminiButton({ images }: Props) {
             {error}
           </p>
         )}
- 
-        {/* The returned text from Gemini, printed as-is */}
+        
+        {/* The returned text from Gemini, printed as-is 
         {text !== null && (
           <pre style={{ whiteSpace: "pre-wrap", marginTop: 12 }}>
             {text || "(Gemini returned an empty response)"}
           </pre>
-        )}
+        )}*/}
       </div>
     </div>
   );
 }
- 
- 
