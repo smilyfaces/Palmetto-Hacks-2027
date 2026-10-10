@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import CameraFeed from "@/components/camera-feed";
+import BottomNav from "@/components/BottomNav";
 
 export default function Home() {
   return (
@@ -51,6 +52,7 @@ export default function Home() {
           </a>
         </div>
       </main>
+      <BottomNav />
     </div>
   );
 }
