@@ -9,7 +9,7 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-cover bg-center bg-no-repeat px-4"
           style={{ backgroundImage: "url('/pantry.jpg')"}}>
       <h1 className="bg-black px-2 py-2 text-center text-3xl font-bold rounded-md">
-        Welcome Back, Username!
+        Welcome Back, Guest!
       </h1>
 
       <Link
