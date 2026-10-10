@@ -1,5 +1,6 @@
 "use client";
  
+import Link from "next/link";
 import { useEffect, useState } from "react";
  
 type Recipe = { id: string; title: string; imageUrl: string | null; have: string[]; missing: string[] };
@@ -55,10 +56,13 @@ export default function RecipeList({ ingredients }: Props) {
   return (
     <div>
       <h2>Recipes you can make</h2>
+      <p>
+        <Link href={`/recipe/${recipes[0].id}`}>Open the top match: {recipes[0].title} →</Link>
+      </p>
       <ol>
         {recipes.map((r) => (
           <li key={r.id} style={{ marginBottom: 8 }}>
-            <strong>{r.title}</strong>
+            <Link href={`/recipe/${r.id}`}><strong>{r.title}</strong></Link>
             <div>
               {r.missing.length === 0
                 ? "You have everything"
