@@ -4,10 +4,10 @@
 import BottomNav from "@/components/BottomNav";
 import { useState } from "react";
 import Image from "next/image";
-import CameraFeed from "@/components/camera-feed";
-import ImageUpload from "@/components/image-upload";
-import SendToGeminiButton from "@/components/send-request";
-import TakePhotoButton from "@/components/photo-button";
+import CameraFeed from "@/components/CameraFeed";
+import ImageUpload from "@/components/ImageUpload";
+import SendToGeminiButton from "@/components/SendRequest";
+import TakePhotoButton from "@/components/PhotoButton";
 
 export default function new_meal_page() {
     const [images, setImages] = useState<string[]>([]);

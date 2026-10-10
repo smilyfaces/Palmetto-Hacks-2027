@@ -1,7 +1,7 @@
 "use client";
  
 import { useEffect, useRef, useState } from "react";
-import ShutterButton from "./photo-button";
+import ShutterButton from "./PhotoButton";
  
 type Props = {
   // Called with a downscaled JPEG data URL each time the shutter is pressed
