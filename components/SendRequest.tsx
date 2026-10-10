@@ -1,7 +1,7 @@
 "use client";
-
+ 
 import { useState } from "react";
-
+ 
 type Recipe = {
   title: string;
   description: string;
@@ -10,7 +10,7 @@ type Recipe = {
   missingIngredients: string[];
   steps: string[];
 };
-
+ 
 type Props = {
   images: string[]; // JPEG data URLs
   onIngredients?: (ingredients: string[]) => void; // the parsed list, once Gemini replies
@@ -29,18 +29,23 @@ function parseIngredients(text: string): string[] {
  
 export default function SendToGeminiButton({ images, onIngredients }: Props) {
   const [sending, setSending] = useState(false);
+  const [pressed, setPressed] = useState(false);
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [text, setText] = useState<string | null>(null); // null = nothing received yet
   const [error, setError] = useState("");
-
+ 
+  const empty = images.length === 0;
+  const disabled = empty || sending;
+ 
   async function findRecipes() {
     setSending(true);
     setError("");
     setIngredients([]);
     setRecipes([]);
-
+ 
     try {
-      const visionResponse = await fetch("/api/test-gemini", {
+      const res = await fetch("/api/test-gemini", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ images }),
@@ -59,13 +64,34 @@ export default function SendToGeminiButton({ images, onIngredients }: Props) {
       setSending(false);
     }
   }
-
+ 
   return (
     <section style={{ width: "100%", maxWidth: 720 }}>
+      <style>{`@keyframes gemini-spin { to { transform: rotate(360deg); } }`}</style>
+ 
       <button
         type="button"
         onClick={findRecipes}
-        disabled={images.length === 0 || sending}
+        disabled={disabled}
+        aria-busy={sending}
+        onPointerDown={() => setPressed(true)}
+        onPointerUp={() => setPressed(false)}
+        onPointerLeave={() => setPressed(false)}
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "6px 12px",
+          border: "1px solid currentColor",
+          borderRadius: 6,
+          background: "transparent",
+          color: "inherit",
+          font: "inherit",
+          cursor: disabled ? "not-allowed" : "pointer",
+          opacity: disabled ? 0.5 : 1,
+          transform: pressed && !disabled ? "scale(0.97)" : "none",
+          transition: "transform 80ms",
+        }}
       >
         {sending && (
           <span
@@ -80,24 +106,39 @@ export default function SendToGeminiButton({ images, onIngredients }: Props) {
             }}
           />
         )}
-        {sending
-          ? "Find Recipes…"
-          : `Load Recipes`}
+        {sending ? "Find Recipes…" : "Load Recipes"}
       </button>
-
-      {error && <p role="alert">{error}</p>}
-
+ 
+      {empty && !sending && (
+        <p style={{ fontSize: 14, opacity: 0.7, marginTop: 6 }}>Upload at least one image first.</p>
+      )}
+ 
+      <div aria-live="polite">
+        {error && (
+          <p role="alert" style={{ marginTop: 6 }}>
+            {error}
+          </p>
+        )}
+ 
+        {/* The returned text from Gemini, printed as-is
+        {text !== null && (
+          <pre style={{ whiteSpace: "pre-wrap", marginTop: 12 }}>
+            {text || "(Gemini returned an empty response)"}
+          </pre>
+        )} */}
+      </div>
+ 
       {ingredients.length > 0 && (
         <div>
           <h2>Ingredients Gemini found</h2>
           <p>{ingredients.join(", ")}</p>
         </div>
       )}
-
+ 
       {recipes.length > 0 && (
         <div>
           <h2>Recipes you can make</h2>
-
+ 
           {recipes.map((recipe) => (
             <article key={recipe.title}>
               <h3>{recipe.title}</h3>
@@ -112,7 +153,7 @@ export default function SendToGeminiButton({ images, onIngredients }: Props) {
                 <strong>Optional extras:</strong>{" "}
                 {recipe.missingIngredients.join(", ")}
               </p>
-
+ 
               <ol>
                 {recipe.steps.map((step, index) => (
                   <li key={index}>{step}</li>
@@ -122,21 +163,6 @@ export default function SendToGeminiButton({ images, onIngredients }: Props) {
           ))}
         </div>
       )}
- 
-      <div aria-live="polite">
-        {error && (
-          <p role="alert" style={{ marginTop: 6 }}>
-            {error}
-          </p>
-        )}
-        
-        {/* The returned text from Gemini, printed as-is 
-        {text !== null && (
-          <pre style={{ whiteSpace: "pre-wrap", marginTop: 12 }}>
-            {text || "(Gemini returned an empty response)"}
-          </pre>
-        )}*/}
-      </div>
-    </div>
+    </section>
   );
 }
