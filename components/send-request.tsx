@@ -78,8 +78,9 @@ export default function SendToGeminiButton({ images }: Props) {
           />
         )}
         {sending
-          ? "Asking Gemini…"
-          : `Send ${empty ? "" : images.length + " "}image${images.length === 1 ? "" : "s"} to Gemini`}
+            //${empty ? "" : images.length + " "}image${images.length === 1 ? "" : "s"}
+          ? "Loading Recipes..."
+          : `Find Recipes`}
       </button>
  
       {empty && !sending && (
