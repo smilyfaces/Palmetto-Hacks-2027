@@ -83,14 +83,14 @@ export default function RecipeModal({ ingredients }: Props) {
  
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-[#193c2d]/25 p-4 backdrop-blur-sm"
       onClick={(e) => e.target === e.currentTarget && setOpen(false)} // click the grey area to close
     >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="recipe-modal-title"
-        className="relative flex max-h-[80vh] w-full max-w-md flex-col rounded-2xl bg-white shadow-xl"
+        className="relative flex max-h-[80vh] w-full max-w-md flex-col rounded-[2rem] bg-[#f7f3ea] shadow-2xl ring-1 ring-white/70"
       >
         <div className="flex items-center justify-between px-5 pb-2 pt-4">
           <h2 id="recipe-modal-title" className="text-lg font-semibold">
