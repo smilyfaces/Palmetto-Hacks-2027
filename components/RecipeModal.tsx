@@ -1,11 +1,10 @@
-
 "use client";
  
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import RecipeCard from "@/components/RecipeCard";
  
-type Recipe = { id: string; title: string; imageUrl: string | null; category: string | null };
+type Recipe = { id: string; title: string; imageUrl: string | null; category: string | null; missing: string[] };
  
 type Props = { ingredients: string[] };
  
@@ -137,8 +136,8 @@ export default function RecipeModal({ ingredients }: Props) {
         aria-labelledby="recipe-modal-title"
         className="relative flex max-h-[80vh] w-full max-w-md flex-col rounded-2xl bg-white shadow-xl"
       >
-        {/* Header: title, close button, and the editable ingredient chips */}
-        <div className="border-b border-gray-100 px-5 pb-3 pt-4">
+        {/* Header: title and close button stay fixed at the top */}
+        <div className="px-5 pb-2 pt-4">
           <div className="flex items-center justify-between">
             <h2 id="recipe-modal-title" className="text-lg font-semibold">
               Recipes you can make
@@ -153,8 +152,11 @@ export default function RecipeModal({ ingredients }: Props) {
               ✕
             </button>
           </div>
+        </div>
  
-          <ul aria-label="Your ingredients" className="mt-3 flex flex-wrap gap-2">
+        {/* Scrollable area: ingredient chips first, then the recipe list */}
+        <div className="overflow-y-auto px-5 pb-5 pt-1">
+          <ul aria-label="Your ingredients" className="flex flex-wrap gap-2">
             {list.map((name, i) => (
               <li
                 key={`${name}-${i}`}
@@ -209,10 +211,8 @@ export default function RecipeModal({ ingredients }: Props) {
               )}
             </li>
           </ul>
-        </div>
  
-        {/* Scrollable recipe list */}
-        <div className="overflow-y-auto px-5 pb-5 pt-3">
+          <div className="mt-3">
           {error ? (
             <p role="alert" className="py-4 text-red-700">
               {error}
@@ -228,12 +228,18 @@ export default function RecipeModal({ ingredients }: Props) {
               {recipes.map((r) => (
                 <li key={r.id}>
                   <Link href={`/recipe/${r.id}`} className="block">
-                    <RecipeCard name={r.title} image={r.imageUrl ?? ""} category={r.category ?? ""} />
+                    <RecipeCard
+                      name={r.title}
+                      image={r.imageUrl ?? ""}
+                      category={r.category ?? ""}
+                      missingCount={r.missing.length}
+                    />
                   </Link>
                 </li>
               ))}
             </ul>
           )}
+          </div>
         </div>
       </div>
     </div>

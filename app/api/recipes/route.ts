@@ -3,11 +3,17 @@ import { normalize, STAPLES } from "@/lib/normalize";
  
 type Ingredient = { name?: string; measure?: string };
  
+const DEFAULT_MAX_MISSING = 3; // hide recipes that need more than this many extra ingredients
+ 
 const tokens = (s: string) => new Set(s.split(" ").filter(Boolean));
 const containsAll = (big: Set<string>, small: Set<string>) => [...small].every((t) => big.has(t));
  
 export async function POST(req: Request) {
-  const { ingredients } = await req.json();
+  const { ingredients, maxMissing: requested } = await req.json();
+  // The client may ask for a different limit; otherwise use the default
+  const maxMissing = Number.isFinite(requested)
+    ? Math.max(0, Math.min(20, Math.floor(requested)))
+    : DEFAULT_MAX_MISSING;
   if (!Array.isArray(ingredients) || ingredients.length === 0) {
     return Response.json({ error: "No ingredients were sent" }, { status: 400 });
   }
@@ -42,7 +48,7 @@ export async function POST(req: Request) {
         (matched ? haveList : missingList).push(name);
       }
  
-      if (haveList.length > 0) {
+      if (haveList.length > 0 && missingList.length <= maxMissing) {
         results.push({
           id: row.meal_id,
           title: row.name,
