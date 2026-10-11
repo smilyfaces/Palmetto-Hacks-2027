@@ -1,6 +1,9 @@
 import Image from "next/image";
+import Link from "next/link";
+import SaveButton from "@/components/SaveButton";
  
 type RecipeCardProps = {
+  id?: string; // when given, the card links to /recipe/[id] and shows a save button
   name: string;
   image: string;
   category: string;
@@ -17,12 +20,13 @@ function missingColor(count: number) {
 }
  
 export default function RecipeCard({
+  id,
   name,
   image,
   category,
   missingCount
 }: RecipeCardProps) {
-  return (
+  const card = (
     <div className="relative h-56 w-full overflow-hidden rounded-2xl bg-gray-200 shadow-md">
       {/* Recipe image (the grey background shows if a recipe has no photo) */}
       {image && (
@@ -60,6 +64,18 @@ export default function RecipeCard({
           </span>
         )}
       </div>
+    </div>
+  );
+ 
+  if (!id) return card;
+ 
+  // The save button is a sibling of the link (not inside it), which keeps the HTML valid
+  return (
+    <div className="relative">
+      <Link href={`/recipe/${id}`} className="block">
+        {card}
+      </Link>
+      <SaveButton recipe={{ id, name, image, category }} className="absolute right-3 top-3" />
     </div>
   );
 }

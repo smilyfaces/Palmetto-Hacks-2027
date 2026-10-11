@@ -1,6 +1,5 @@
 "use client";
  
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import RecipeCard from "@/components/RecipeCard";
  
@@ -100,7 +99,7 @@ export default function RecipeModal({ ingredients }: Props) {
   // While open: Escape closes, the page behind can't scroll, and focus moves to the close button
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
     document.addEventListener("keydown", onKey);
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -134,7 +133,7 @@ export default function RecipeModal({ ingredients }: Props) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="recipe-modal-title"
-        className="relative flex max-h-[80vh] w-full max-w-md flex-col rounded-[2rem] bg-[#f7f3ea] shadow-2xl ring-1 ring-white/70"
+        className="relative flex max-h-[80vh] w-full max-w-md flex-col rounded-2xl bg-white shadow-xl"
       >
         {/* Header: title and close button stay fixed at the top */}
         <div className="px-5 pb-2 pt-4">
@@ -227,14 +226,12 @@ export default function RecipeModal({ ingredients }: Props) {
             <ul className={`space-y-3 transition-opacity ${loading ? "opacity-50" : ""}`} aria-busy={loading}>
               {recipes.map((r) => (
                 <li key={r.id}>
-                  <Link href={`/recipe/${r.id}`} className="block">
-                    <RecipeCard
+                  <RecipeCard id={r.id}
                       name={r.title}
                       image={r.imageUrl ?? ""}
                       category={r.category ?? ""}
                       missingCount={r.missing.length}
                     />
-                  </Link>
                 </li>
               ))}
             </ul>
