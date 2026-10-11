@@ -54,18 +54,22 @@ export default function RecipeModal({ ingredients }: Props) {
   }, [key]);
  
   // While open: Escape closes, the page behind can't scroll, and focus moves to the close button
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    document.addEventListener("keydown", onKey);
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    closeRef.current?.focus();
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [open]);
+useEffect(() => {
+  if (!open) return;
+
+  const onKey = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      setOpen(false);
+    }
+  };
+
+  document.addEventListener("keydown", onKey);
+  closeRef.current?.focus();
+
+  return () => {
+    document.removeEventListener("keydown", onKey);
+  };
+}, [open]);
  
   // Closed: offer a small button to bring the results back
   if (!open) {
