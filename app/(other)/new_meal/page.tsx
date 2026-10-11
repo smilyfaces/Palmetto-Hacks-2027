@@ -13,7 +13,7 @@ export default function NewMealPage() {
   const [ingredients, setIngredients] = useState<string[]>([]);
 
   return (
-    <main className="min-h-screen bg-[#f7f3ea] pb-32 pt-28 text-[#193c2d]">
+    <main className="min-h-screen bg-[#f7f3ea] pb-38 pt-28 text-[#193c2d]">
       <div className="mx-auto w-full max-w-md px-4">
         { /*
         <Link
@@ -23,7 +23,7 @@ export default function NewMealPage() {
           ← Back home
         </Link>
        */ }
-        <section className="mt-5 rounded-[2rem] bg-[#193c2d] p-6 text-white shadow-lg">
+        <section className="rounded-[2rem] bg-[#193c2d] p-6 text-white shadow-lg">
           <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#f5d98b]">
             FridgeSnap
           </p>
