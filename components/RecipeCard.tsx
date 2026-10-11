@@ -7,6 +7,7 @@ type RecipeCardProps = {
   name: string;
   image: string;
   category: string;
+  missingIngrediants?: string[];
   missingCount?: number; // how many ingredients you still need; the badge is hidden if omitted
   compact?: boolean; // a shorter card, used in the community feed
 };
@@ -26,6 +27,7 @@ export default function RecipeCard({
   image,
   category,
   missingCount,
+  missingIngrediants,
   compact = false
 }: RecipeCardProps) {
   const card = (
@@ -55,6 +57,22 @@ export default function RecipeCard({
           {missingCount === 0 ? "You have it all" : `${missingCount} missing`}
         </span>
       )}
+
+      {missingIngrediants && missingIngrediants.length > 0 && (
+      <div className="absolute left-3 top-14 z-20 flex max-w-[80%] flex-col items-start gap-1">
+      {missingIngrediants.map((ingredient, index) => (
+        <span
+          key={`${ingredient}-${index}`}
+          className="inline-flex items-center gap-2 rounded-full bg-red-600 py-1 pl-1.5 pr-3 text-sm font-semibold text-white shadow-md"
+        >
+          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white text-red-600 text-base font-bold leading-none">
+            ×
+          </span>
+          {ingredient}
+        </span>
+      ))}
+    </div>
+    )}
  
       {/* Recipe information */}
       <div

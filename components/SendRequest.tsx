@@ -113,7 +113,7 @@ export default function SendToGeminiButton({ images, onIngredients }: Props) {
             }}
           />
         )}
-        {sending ? "Find Recipes…" : "Load Recipes"}
+        {sending ? "Finding Recipes…" : "Find Recipes"}
       </button>
  
       {empty && !sending && (

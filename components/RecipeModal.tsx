@@ -231,6 +231,7 @@ export default function RecipeModal({ ingredients }: Props) {
                       image={r.imageUrl ?? ""}
                       category={r.category ?? ""}
                       missingCount={r.missing.length}
+                      missingIngrediants={r.missing}
                     />
                 </li>
               ))}
