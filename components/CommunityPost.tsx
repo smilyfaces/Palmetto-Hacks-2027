@@ -3,7 +3,8 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import RecipeCard from "@/components/RecipeCard";
-import type { CommunityPostData } from "@/lib/communityMock";
+import ReactionButtons from "@/components/ReactionButtons";
+import type { CommunityPostData } from "@/lib/communityTypes";
  
 type Props = { post: CommunityPostData; rank: number };
  
@@ -12,8 +13,10 @@ export default function CommunityPost({ post, rank }: Props) {
   const [canLeft, setCanLeft] = useState(false);
   const [canRight, setCanRight] = useState(false);
  
-  const total = post.likes + post.dislikes;
-  const percentLiked = total === 0 ? 0 : Math.round((post.likes / total) * 100);
+  const [counts, setCounts] = useState({ likes: post.likes, dislikes: post.dislikes });
+ 
+  const total = counts.likes + counts.dislikes;
+  const percentLiked = total === 0 ? 0 : Math.round((counts.likes / total) * 100);
  
   // Show an arrow only when there's more to scroll in that direction
   function updateArrows() {
@@ -33,6 +36,7 @@ export default function CommunityPost({ post, rank }: Props) {
   return (
     <article className="overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-[#e6dfd0]">
       {/* Photo strip: several small photos side by side, swipe or use the arrows to see more */}
+      {post.photos.length > 0 && (
       <div className="relative px-3 pt-3">
         <div
           ref={strip}
@@ -56,11 +60,11 @@ export default function CommunityPost({ post, rank }: Props) {
               ) : (
                 <div
                   className="grid h-full w-full place-items-center text-5xl"
-                  style={{ background: `linear-gradient(135deg, ${photo.from}, ${photo.to})` }}
+                  style={{ background: `linear-gradient(135deg, ${photo.from ?? "#cbd6ca"}, ${photo.to ?? "#83a98b"})` }}
                   role="img"
                   aria-label={`Placeholder photo of ${post.name} by ${photo.user}`}
                 >
-                  <span aria-hidden>{photo.emoji}</span>
+                  <span aria-hidden>{photo.emoji ?? "🍽️"}</span>
                 </div>
               )}
  
@@ -96,25 +100,24 @@ export default function CommunityPost({ post, rank }: Props) {
           </button>
         )}
       </div>
+      )}
  
       {/* Compact recipe card and reactions */}
       <div className="p-3">
         <RecipeCard id={post.id} name={post.name} image={post.image} category={post.category} compact />
  
-        <div className="mt-3 flex items-center gap-2 text-sm font-bold">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e5efe6] px-3 py-1 text-[#193c2d]">
-            <span aria-hidden>👍</span>
-            {post.likes.toLocaleString()}
-            <span className="sr-only"> likes</span>
-          </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-rose-700">
-            <span aria-hidden>👎</span>
-            {post.dislikes.toLocaleString()}
-            <span className="sr-only"> dislikes</span>
-          </span>
-          <span className="ml-auto text-xs font-semibold text-[#6b7d70]">
-            {post.photos.length} {post.photos.length === 1 ? "photo" : "photos"}
-          </span>
+        <div className="mt-3 flex items-center gap-2">
+          <ReactionButtons
+            recipeId={post.id}
+            size="sm"
+            initial={{ likes: post.likes, dislikes: post.dislikes, myVote: post.myVote ?? 0 }}
+            onChange={(r) => setCounts({ likes: r.likes, dislikes: r.dislikes })}
+          />
+          {post.photos.length > 0 && (
+            <span className="ml-auto text-xs font-semibold text-[#6b7d70]">
+              {post.photos.length} {post.photos.length === 1 ? "photo" : "photos"}
+            </span>
+          )}
         </div>
  
         <div className="mt-2.5 flex items-center gap-2">

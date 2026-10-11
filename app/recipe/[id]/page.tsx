@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import BackButton from "@/components/BackButton";
+import AddPhotos from "@/components/AddPhotos";
+import ReactionButtons from "@/components/ReactionButtons";
 import SaveButton from "@/components/SaveButton";
 import { getRecipe } from "@/lib/recipes";
  
@@ -150,6 +152,19 @@ async function RecipeContent({
     </li>
   ))}
 </ol>
+      </section>
+ 
+      <section className="mt-5 rounded-[2rem] bg-white p-5 shadow-sm ring-1 ring-[#e6dfd0]">
+        <h2 className="text-xl font-bold">How did it turn out?</h2>
+        <p className="mt-1 text-sm text-[#6b7d70]">Rate this recipe and show off your version.</p>
+ 
+        <div className="mt-4">
+          <ReactionButtons recipeId={recipe.id} />
+        </div>
+ 
+        <div className="mt-5">
+          <AddPhotos recipeId={recipe.id} />
+        </div>
       </section>
  
       {recipe.sourceUrl && (

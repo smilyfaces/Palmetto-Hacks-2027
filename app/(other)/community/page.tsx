@@ -1,8 +1,9 @@
 "use client";
  
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import CommunityPost from "@/components/CommunityPost";
-import { COMMUNITY_POSTS } from "@/lib/communityMock";
+import type { CommunityPostData } from "@/lib/communityTypes";
+import { getVoterId } from "@/lib/voter";
  
 type TabId = "liked" | "disliked" | "popular";
  
@@ -14,13 +15,25 @@ const TABS: { id: TabId; label: string; emoji: string; blurb: string }[] = [
  
 export default function CommunityPage() {
   const [tab, setTab] = useState<TabId>("liked");
+  const [posts, setPosts] = useState<CommunityPostData[] | null>(null);
+  const [error, setError] = useState("");
  
-  const posts = useMemo(() => {
-    const list = [...COMMUNITY_POSTS];
-    if (tab === "liked") list.sort((a, b) => b.likes - a.likes);
-    if (tab === "disliked") list.sort((a, b) => b.dislikes - a.dislikes);
-    if (tab === "popular") list.sort((a, b) => b.likes + b.dislikes - (a.likes + a.dislikes));
-    return list;
+  useEffect(() => {
+    let cancelled = false;
+    setPosts(null);
+    setError("");
+ 
+    fetch(`/api/community?tab=${tab}&voterId=${encodeURIComponent(getVoterId())}`)
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error ?? "Couldn't load the community feed.");
+        if (!cancelled) setPosts(data.posts);
+      })
+      .catch((err) => !cancelled && setError(err instanceof Error ? err.message : "Something went wrong."));
+ 
+    return () => {
+      cancelled = true;
+    };
   }, [tab]);
  
   const active = TABS.find((t) => t.id === tab)!;
@@ -67,21 +80,31 @@ export default function CommunityPage() {
         <p className="mt-4 text-sm text-[#6b7d70]">{active.blurb}</p>
  
         {/* Feed */}
-        <ul role="tabpanel" className="mt-4 space-y-5">
-          {posts.map((post, i) => (
-            <li key={post.id}>
-              <CommunityPost post={post} rank={i + 1} />
-            </li>
-          ))}
-        </ul>
- 
-        <section className="mt-6 rounded-2xl border border-dashed border-[#cbd6ca] bg-[#edf3ed] p-5">
-          <p className="text-sm font-bold">Sample data</p>
-          <p className="mt-1 text-sm leading-6 text-[#557060]">
-            Likes, dislikes, and photos here are placeholders. They&apos;ll come from the database once
-            reactions and photo uploads are connected.
+        {error ? (
+          <p role="alert" className="mt-6 rounded-2xl bg-rose-50 p-4 text-sm font-semibold text-rose-700">
+            {error}
           </p>
-        </section>
+        ) : posts === null ? (
+          <p className="mt-6 animate-pulse text-center text-sm font-medium text-[#6b7d70]">Loading the feed…</p>
+        ) : posts.length === 0 ? (
+          <section className="mt-6 rounded-[2rem] bg-white px-6 py-12 text-center shadow-sm ring-1 ring-[#e6dfd0]">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#e5efe6] text-4xl">
+              {active.emoji}
+            </div>
+            <h2 className="mt-6 text-xl font-bold">Nothing here yet</h2>
+            <p className="mx-auto mt-2 max-w-xs text-sm leading-6 text-[#6b7d70]">
+              Open a recipe and tap like or dislike, or add a photo of your finished dish, and it will show up here.
+            </p>
+          </section>
+        ) : (
+          <ul role="tabpanel" className="mt-4 space-y-5">
+            {posts.map((post, i) => (
+              <li key={`${tab}-${post.id}`}>
+                <CommunityPost post={post} rank={i + 1} />
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </main>
   );
