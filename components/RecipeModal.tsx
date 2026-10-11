@@ -135,7 +135,7 @@ export default function RecipeModal({ ingredients }: Props) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="recipe-modal-title"
-        className="relative flex max-h-[80vh] w-full max-w-md flex-col rounded-2xl bg-white shadow-xl"
+        className="relative flex max-h-[80vh] w-full max-w-md flex-col rounded-[2rem] bg-[#f7f3ea] shadow-2xl ring-1 ring-white/70"
       >
         {/* Header: title, close button, and the editable ingredient chips */}
         <div className="border-b border-gray-100 px-5 pb-3 pt-4">
