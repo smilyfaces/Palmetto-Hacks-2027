@@ -1,6 +1,7 @@
-"use client";
+"client";
  
 import { useState } from "react";
+import RecipeModal from "@/components/RecipeModal";
  
 type Recipe = {
   title: string;
@@ -55,7 +56,13 @@ export default function SendToGeminiButton({ images, onIngredients }: Props) {
  
       console.log("Gemini replied:", data.text);
       setText(data.text);
-      onIngredients?.(parseIngredients(data.text));
+ 
+      const parsed = parseIngredients(data.text);
+      if (parsed.length === 0) {
+        throw new Error("Couldn't find any ingredients in those photos. Try clearer shots.");
+      }
+      setIngredients(parsed); // this is what opens the recipe popup
+      onIngredients?.(parsed);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Something went wrong. Please try again."
@@ -163,6 +170,9 @@ export default function SendToGeminiButton({ images, onIngredients }: Props) {
           ))}
         </div>
       )}
+ 
+      {/* Loads matching recipes for the ingredients above and pops open when they're ready */}
+      <RecipeModal ingredients={ingredients} />
     </section>
   );
 }

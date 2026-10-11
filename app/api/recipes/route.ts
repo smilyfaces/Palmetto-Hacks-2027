@@ -21,7 +21,7 @@ export async function POST(req: Request) {
   try {
     // The table is a few hundred rows, so we fetch the light columns and match in code.
     const { rows } = await pool.query(
-      "SELECT meal_id, name, thumbnail_url, ingredients FROM recipes"
+      "SELECT meal_id, name, category, thumbnail_url, ingredients FROM recipes"
     );
  
     const results = [];
@@ -46,6 +46,7 @@ export async function POST(req: Request) {
         results.push({
           id: row.meal_id,
           title: row.name,
+          category: row.category,
           imageUrl: row.thumbnail_url,
           have: haveList,
           missing: missingList,

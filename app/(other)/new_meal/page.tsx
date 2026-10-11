@@ -6,6 +6,7 @@ import CameraFeed from "@/components/CameraFeed";
 import ImageUpload from "@/components/ImageUpload";
 import SendToGeminiButton from "@/components/SendRequest";
 import RecipeList from "@/components/RecipeList";
+import RecipeModal from "@/components/RecipeModal";
 
 export default function NewMealPage() {
   const [images, setImages] = useState<string[]>([]);
@@ -115,7 +116,7 @@ export default function NewMealPage() {
               <h2 className="text-2xl font-bold">Recipes to try</h2>
             </div>
 
-            <RecipeList ingredients={ingredients} />
+            <RecipeModal ingredients={ingredients} />
           </section>
         )}
       </div>
