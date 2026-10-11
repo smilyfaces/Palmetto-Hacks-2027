@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Milestones from "@/components/Milestones"
 
 export default function Home() {
   return (
@@ -32,57 +33,8 @@ export default function Home() {
             </Link>
           </div>
         </div>
-        {/*
-        <section className="mt-7">
-          <div className="flex items-end justify-between">
-            <div>
-              <p className="text-sm font-semibold text-[#6b7d70]">
-                How FridgeSnap works
-              </p>
-              <h2 className="mt-1 text-2xl font-bold">Simple from start to plate.</h2>
-            </div>
-          </div>
-          
-          <div className="mt-4 grid gap-3">
-            <article className="flex items-center gap-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-[#e6dfd0]">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#e5efe6] text-2xl">
-                1
-              </div>
-              <div>
-                <h3 className="font-bold">Take a photo</h3>
-                <p className="mt-1 text-sm text-[#6b7d70]">
-                  Show us your fridge, pantry, or counter.
-                </p>
-              </div>
-            </article>
-
-            <article className="flex items-center gap-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-[#e6dfd0]">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#e5efe6] text-2xl">
-                2
-              </div>
-              <div>
-                <h3 className="font-bold">Find your ingredients</h3>
-                <p className="mt-1 text-sm text-[#6b7d70]">
-                  Gemini identifies the food it can see.
-                </p>
-              </div>
-            </article>
-
-            <article className="flex items-center gap-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-[#e6dfd0]">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#e5efe6] text-2xl">
-                3
-              </div>
-              <div>
-                <h3 className="font-bold">Get recipe ideas</h3>
-                <p className="mt-1 text-sm text-[#6b7d70]">
-                  Cook with what you already have first.
-                </p>
-              </div>
-            </article>
-          </div>
-        </section>
-        */}
       </section>
+      <Milestones />
     </main>
   );
 }
