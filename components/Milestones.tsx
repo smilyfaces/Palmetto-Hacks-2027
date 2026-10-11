@@ -51,7 +51,7 @@ export default function Milestones({
     : 100;
 
   return (
-    <section className="w-full rounded-3xl border border-gray-400 bg-white p-8 max-w-md mx-auto mt-8">
+    <section className="w-full rounded-3xl border border-gray-400 bg-white p-8 max-w-sm mx-auto mt-8">
       {/* Header */}
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">

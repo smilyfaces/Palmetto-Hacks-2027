@@ -6,7 +6,7 @@ import Milestones from "@/components/Milestones"
 export default function Home() {
   return (
     <main className="min-h-screen bg-white pb-32 pt-28 text-[#193c2d]">
-      <section className="mx-auto w-full max-w-md">
+      <section className="mx-auto w-full max-w-sm">
         <div
           className="relative overflow-hidden rounded-3xl bg-cover bg-center shadow-xl"
           style={{ backgroundImage: "url('/pantry.jpg')" }}
