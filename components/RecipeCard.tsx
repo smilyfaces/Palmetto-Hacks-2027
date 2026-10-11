@@ -8,6 +8,7 @@ type RecipeCardProps = {
   image: string;
   category: string;
   missingCount?: number; // how many ingredients you still need; the badge is hidden if omitted
+  compact?: boolean; // a shorter card, used in the community feed
 };
  
 const SCALE_MAX = 3; // this many missing (or more) is fully red; matches the route's default limit
@@ -24,10 +25,13 @@ export default function RecipeCard({
   name,
   image,
   category,
-  missingCount
+  missingCount,
+  compact = false
 }: RecipeCardProps) {
   const card = (
-    <div className="relative h-56 w-full overflow-hidden rounded-2xl bg-gray-200 shadow-md">
+    <div
+      className={`relative ${compact ? "h-24" : "h-56"} w-full overflow-hidden rounded-2xl bg-gray-200 shadow-md`}
+    >
       {/* Recipe image (the grey background shows if a recipe has no photo) */}
       {image && (
         <Image
@@ -53,13 +57,19 @@ export default function RecipeCard({
       )}
  
       {/* Recipe information */}
-      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4">
-        <h2 className="text-xl font-bold text-white">
+      <div
+        className={`absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 ${compact ? "p-3" : "p-4"}`}
+      >
+        <h2 className={`${compact ? "text-base leading-tight" : "text-xl"} font-bold text-white`}>
           {name}
         </h2>
  
         {category && (
-          <span className="shrink-0 rounded-full bg-white/90 px-3 py-1.5 text-sm font-medium text-gray-900">
+          <span
+            className={`shrink-0 rounded-full bg-white/90 font-medium text-gray-900 ${
+              compact ? "px-2.5 py-1 text-xs" : "px-3 py-1.5 text-sm"
+            }`}
+          >
             {category}
           </span>
         )}
@@ -75,7 +85,11 @@ export default function RecipeCard({
       <Link href={`/recipe/${id}`} className="block">
         {card}
       </Link>
-      <SaveButton recipe={{ id, name, image, category }} className="absolute right-3 top-3" />
+      <SaveButton
+        recipe={{ id, name, image, category }}
+        small={compact}
+        className={`absolute ${compact ? "right-2 top-2" : "right-3 top-3"}`}
+      />
     </div>
   );
 }

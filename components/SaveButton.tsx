@@ -5,10 +5,11 @@ import { toggleSaved, useSavedRecipes, type SavedRecipe } from "@/lib/savedRecip
 type Props = {
   recipe: Omit<SavedRecipe, "savedAt">;
   variant?: "icon" | "full"; // icon = round heart for cards, full = labeled button for the recipe page
+  small?: boolean; // a smaller heart, for compact cards
   className?: string;
 };
  
-export default function SaveButton({ recipe, variant = "icon", className = "" }: Props) {
+export default function SaveButton({ recipe, variant = "icon", small = false, className = "" }: Props) {
   const { isSaved, ready } = useSavedRecipes();
   const saved = ready && isSaved(recipe.id);
  
@@ -40,7 +41,7 @@ export default function SaveButton({ recipe, variant = "icon", className = "" }:
       onClick={onClick}
       aria-pressed={saved}
       aria-label={saved ? `Remove ${recipe.name} from saved recipes` : `Save ${recipe.name}`}
-      className={`grid size-9 place-items-center rounded-full bg-white/90 text-xl leading-none shadow transition active:scale-90 ${
+      className={`grid ${small ? "size-7 text-base" : "size-9 text-xl"} place-items-center rounded-full bg-white/90 leading-none shadow transition active:scale-90 ${
         saved ? "text-rose-600" : "text-gray-800"
       } ${className}`}
     >
