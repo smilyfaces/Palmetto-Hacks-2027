@@ -1,7 +1,6 @@
-"client";
+"use client";
  
 import { useState } from "react";
-import RecipeModal from "@/components/RecipeModal";
  
 type Recipe = {
   title: string;
@@ -44,6 +43,7 @@ export default function SendToGeminiButton({ images, onIngredients }: Props) {
     setError("");
     setIngredients([]);
     setRecipes([]);
+    onIngredients?.([]); // lets the page reset, so the recipe popup reopens fresh
  
     try {
       const res = await fetch("/api/test-gemini", {
@@ -113,7 +113,7 @@ export default function SendToGeminiButton({ images, onIngredients }: Props) {
             }}
           />
         )}
-        {sending ? "Find Recipes…" : "Load Recipes"}
+        {sending ? "Finding Recipes…" : "Find Recipes"}
       </button>
  
       {empty && !sending && (
@@ -134,13 +134,6 @@ export default function SendToGeminiButton({ images, onIngredients }: Props) {
           </pre>
         )} */}
       </div>
- 
-      {ingredients.length > 0 && (
-        <div>
-          <h2>Ingredients Gemini found</h2>
-          <p>{ingredients.join(", ")}</p>
-        </div>
-      )}
  
       {recipes.length > 0 && (
         <div>
@@ -170,9 +163,6 @@ export default function SendToGeminiButton({ images, onIngredients }: Props) {
           ))}
         </div>
       )}
- 
-      {/* Loads matching recipes for the ingredients above and pops open when they're ready */}
-      <RecipeModal ingredients={ingredients} />
     </section>
   );
 }

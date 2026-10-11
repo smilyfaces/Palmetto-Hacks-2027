@@ -4,7 +4,7 @@ import BottomNav from "@/components/BottomNav";
 export default function MainLayout({ children, }: Readonly<{ children: React.ReactNode; }>) {
   return (
     <div>
-      <body className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col">
         <div className="fixed top-0 left-0 z-50 w-full px-4">
           <Header />
         </div>
@@ -16,7 +16,7 @@ export default function MainLayout({ children, }: Readonly<{ children: React.Rea
             <BottomNav />
           </div>
         </div>
-      </body>
+      </div>
     </div>
   );
 }
