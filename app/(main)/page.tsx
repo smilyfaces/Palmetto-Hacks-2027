@@ -18,16 +18,9 @@ export default function Home() {
                 Welcome back, Username!
               </p>
 
-              <h1 className="mt-2 text-4xl font-bold leading-tight">
-                Turn what you have
-                <br />
-                into something good.
+              <h1 className="mt-2 text-4xl font-bold leading-tight text-center">
+                Ready to try something new?
               </h1>
-
-              <p className="mt-4 max-w-xs text-sm leading-6 text-white/85">
-                Snap a photo of your fridge, pantry, or ingredients and
-                FridgeSnap will help you find a meal to make.
-              </p>
             </div>
 
             <Link
