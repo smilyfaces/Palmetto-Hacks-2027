@@ -50,13 +50,15 @@ export default function Header() {
         className="h-auto w-18 aspect-square object-contain"
       />
 
-      <Image
-        src="/tier.png"
-        alt="User tier"
-        width={447}
-        height={447}
-        className="h-auto w-18 aspect-square object-contain"
-      />
+      <button
+        type="button"
+        aria-label="Account"
+        className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90 text-[#193c2d] shadow-md transition hover:scale-105 hover:bg-white"
+      >
+        <span className="material-symbols-outlined text-[34px] leading-none">
+            account_circle
+        </span>
+        </button>
     </header>
   );
 }
