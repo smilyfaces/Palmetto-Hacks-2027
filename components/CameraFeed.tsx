@@ -51,7 +51,7 @@ export default function CameraFeed({ onCapture }: Props) {
 
   function handleCapture(image: string) {
     onCapture(image);
-    closeCamera();
+    //closeCamera();
   }
 
   useEffect(() => {
@@ -61,88 +61,107 @@ export default function CameraFeed({ onCapture }: Props) {
   }, []);
 
   return (
-    <section
+<section
+  style={{
+    position: "relative",
+    width: "100%",
+    maxWidth: 480,
+    overflow: "hidden",
+    borderRadius: 16,
+    background: "#111827",
+    color: "white",
+  }}
+>
+  {cameraOpen && (
+    <button
+    type="button"
+    onClick={closeCamera}
+    aria-label="Close camera"
+    style={{
+      position: "absolute",
+      top: 12,
+      right: 12,
+      zIndex: 999,
+
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+
+      width: 36,
+      height: 36,
+      padding: 0,
+      border: "1px solid rgba(255,255,255,0.5)",
+      borderRadius: "50%",
+
+      background: "rgba(0,0,0,0.6)",
+      color: "white",
+      fontSize: 22,
+      fontWeight: 400,
+      lineHeight: 1,
+      cursor: "pointer",
+    }}
+  >
+    ×
+  </button>
+  )}
+
+  <video
+    ref={videoRef}
+    playsInline
+    muted
+    style={{
+      display: cameraOpen ? "block" : "none",
+      width: "100%",
+    }}
+  />
+
+  {!cameraOpen && (
+    <div style={{ padding: 24, textAlign: "center" }}>
+      <p style={{ marginTop: 0, marginBottom: 15 }}>
+        Take a photo of the ingredients in your fridge or pantry.
+      </p>
+
+      <button
+        type="button"
+        onClick={openCamera}
+        style={{
+          border: "none",
+          borderRadius: 999,
+          padding: "12px 18px",
+          background: "#22c55e",
+          color: "#052e16",
+          fontSize: 16,
+          fontWeight: 700,
+          cursor: "pointer",
+        }}
+      >
+        Take a Photo
+      </button>
+
+      {error && (
+        <p role="alert" style={{ marginBottom: 0, color: "#fecaca" }}>
+          {error}
+        </p>
+      )}
+    </div>
+  )}
+
+  {cameraOpen && (
+    <div
       style={{
-        width: "100%",
-        maxWidth: 480,
-        overflow: "hidden",
-        borderRadius: 16,
-        background: "#111827",
-        color: "white",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "16px 40px",
       }}
     >
-      <video
-        ref={videoRef}
-        playsInline
-        muted
-        style={{
-          display: cameraOpen ? "block" : "none",
-          width: "100%",
-        }}
+      <ShutterButton
+        videoRef={videoRef}
+        active={cameraOpen}
+        onCapture={handleCapture}
       />
-
-      {!cameraOpen && (
-        <div style={{ padding: 24, textAlign: "center" }}>
-          <p style={{ marginTop: 0 }}>
-            Take a photo of the ingredients in your fridge or pantry.
-          </p>
-
-          <button
-            type="button"
-            onClick={openCamera}
-            style={{
-              border: "none",
-              borderRadius: 999,
-              padding: "12px 18px",
-              background: "#22c55e",
-              color: "#052e16",
-              fontSize: 16,
-              fontWeight: 700,
-              cursor: "pointer",
-            }}
-          >
-            Take a Photo
-          </button>
-
-          {error && (
-            <p role="alert" style={{ marginBottom: 0, color: "#fecaca" }}>
-              {error}
-            </p>
-          )}
-        </div>
-      )}
-
-      {cameraOpen && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "16px 20px",
-          }}
-        >
-          <button
-            type="button"
-            onClick={closeCamera}
-            style={{
-              border: "none",
-              background: "transparent",
-              color: "white",
-              cursor: "pointer",
-            }}
-          >
-            Cancel
-          </button>
-
-          <ShutterButton
-            videoRef={videoRef}
-            active={cameraOpen}
-            onCapture={handleCapture}
-          />
-
-          <span style={{ width: 48 }} />
-        </div>
-      )}
-    </section>
+    </div>
+  )}
+</section>
   );
 }
