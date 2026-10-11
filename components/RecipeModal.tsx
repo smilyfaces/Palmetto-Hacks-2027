@@ -100,7 +100,7 @@ export default function RecipeModal({ ingredients }: Props) {
   // While open: Escape closes, the page behind can't scroll, and focus moves to the close button
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
     document.addEventListener("keydown", onKey);
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -134,7 +134,7 @@ export default function RecipeModal({ ingredients }: Props) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="recipe-modal-title"
-        className="relative flex max-h-[80vh] w-full max-w-md flex-col rounded-2xl bg-white shadow-xl"
+        className="relative flex max-h-[80vh] w-full max-w-md flex-col rounded-[2rem] bg-[#f7f3ea] shadow-2xl ring-1 ring-white/70"
       >
         {/* Header: title and close button stay fixed at the top */}
         <div className="px-5 pb-2 pt-4">
